@@ -270,12 +270,12 @@ public class AppScheduler extends JDialog implements ActionListener,
 		date[0] = Utility.getNumber(yearF.getText());
 		date[1] = Utility.getNumber(monthF.getText());
 		if (date[0] < 1980 || date[0] > 2100) {
-			JOptionPane.showMessageDialog(this, "Please input proper year",
+			JOptionPane.showMessageDialog(this, "Please input proper year.",
 					"Input Error", JOptionPane.ERROR_MESSAGE);
 			return null;
 		}
 		if (date[1] <= 0 || date[1] > 12) {
-			JOptionPane.showMessageDialog(this, "Please input proper month",
+			JOptionPane.showMessageDialog(this, "Please input proper month.",
 					"Input Error", JOptionPane.ERROR_MESSAGE);
 			return null;
 		}
@@ -289,7 +289,7 @@ public class AppScheduler extends JDialog implements ActionListener,
 		}
 		if (date[2] <= 0 || date[2] > monthDay) {
 			JOptionPane.showMessageDialog(this,
-			"Please input proper month day", "Input Error",
+			"Please input proper month day.", "Input Error",
 			JOptionPane.ERROR_MESSAGE);
 			return null;
 		}
@@ -353,6 +353,10 @@ public class AppScheduler extends JDialog implements ActionListener,
 	private void saveButtonResponse() {
 		// Fix Me!
 		// Save the appointment to the hard disk
+		int[] date = getValidDate();
+		int[] time = getValidTimeInterval();
+		if(date != null & time != null)
+		setVisible(false);
 	}
 
 	private Timestamp CreateTimeStamp(int[] date, int time) {
