@@ -13,6 +13,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -26,6 +28,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -79,6 +82,8 @@ public class AppScheduler extends JDialog implements ActionListener,
 	private JSplitPane pDes;
 	JPanel detailPanel;
 	private JComboBox Frequency;
+	private JTextField NotiField;
+	private JCheckBox jbox;
 //	private JTextField attendField;
 //	private JTextField rejectField;
 //	private JTextField waitingField;
@@ -160,12 +165,31 @@ public class AppScheduler extends JDialog implements ActionListener,
 		titleAndTextPanel.add(FreqL);
 		titleAndTextPanel.add(Frequency);
 		
+		JLabel NotiL = new JLabel("Notification");
+		NotiField = new JTextField(2);
+		JLabel NotiMin = new JLabel("Minute(s) before");
+		NotiField.setEnabled(false);
+        final JCheckBox cbox = new JCheckBox("", false);
+        ItemListener itemListener = new ItemListener()
+        {
+            public void itemStateChanged(ItemEvent ie)
+            {
+            	NotiField.setEnabled(ie.getStateChange() == ItemEvent.SELECTED);
+            }
+        };
+        cbox.addItemListener(itemListener);
+		titleAndTextPanel.add(NotiL);
+		titleAndTextPanel.add(NotiField);
+		titleAndTextPanel.add(NotiMin);
+        titleAndTextPanel.add (cbox);
+           
 		Location[]locations	=cal.controller.getLocationList();	
 		if	(locations	==	null)	{	
 		locations	=	new	Location[0];	
 		}	
+		String[] loc = {"home","school","sex party"};
 		JLabel locationL	=	new	JLabel("LOCATION");	
-		JComboBox locField = new	JComboBox(locations);	
+		JComboBox locField = new	JComboBox(loc);	
 		titleAndTextPanel.add(locationL);	
 		titleAndTextPanel.add(locField);
 		
