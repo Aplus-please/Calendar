@@ -375,7 +375,16 @@ public class CalGrid extends JFrame implements ActionListener {
 		mi = new JMenuItem("Manual Scheduling");
 		mi.addActionListener(listener);
 		Appmenu.add(mi);
+		
+		mi = new JMenuItem("Manage Locations");
+		mi.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent arg0){
+				LocationsDialog dlg = new LocationsDialog(controller);
+				
+			}
+		});
 
+		Appmenu.add(mi);
 		return menuBar;
 	}
 

@@ -26,6 +26,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -38,10 +39,12 @@ import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 
+import hkust.cse.calendar.unit.Location;;
 
 public class AppScheduler extends JDialog implements ActionListener,
 		ComponentListener {
 
+	private	JComboBox locField;
 	private JLabel yearL;
 	private JTextField yearF;
 	private JLabel monthL;
@@ -151,6 +154,15 @@ public class AppScheduler extends JDialog implements ActionListener,
 		titleAndTextPanel.add(titleL);
 		titleAndTextPanel.add(titleField);
 
+		Location[]locations	=cal.controller.getLocationList();	
+		if	(locations	==	null)	{	
+		locations	=	new	Location[0];	
+		}	
+		JLabel locationL	=	new	JLabel("LOCATION");	
+		JComboBox locField = new	JComboBox(locations);	
+		titleAndTextPanel.add(locationL);	
+		titleAndTextPanel.add(locField);
+		
 		detailPanel = new JPanel();	// Container for Appointment Description
 		detailPanel.setLayout(new BorderLayout());
 		Border detailBorder = new TitledBorder(null, "Appointment Description");
