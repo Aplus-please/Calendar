@@ -78,7 +78,7 @@ public class AppScheduler extends JDialog implements ActionListener,
 
 	private JSplitPane pDes;
 	JPanel detailPanel;
-
+	private JComboBox Frequency;
 //	private JTextField attendField;
 //	private JTextField rejectField;
 //	private JTextField waitingField;
@@ -154,6 +154,12 @@ public class AppScheduler extends JDialog implements ActionListener,
 		titleAndTextPanel.add(titleL);
 		titleAndTextPanel.add(titleField);
 
+		String[] Freq ={"Once","Daily","Weekly","Monthly"};
+		JLabel FreqL = new JLabel("Frequency");
+		Frequency = new JComboBox(Freq);
+		titleAndTextPanel.add(FreqL);
+		titleAndTextPanel.add(Frequency);
+		
 		Location[]locations	=cal.controller.getLocationList();	
 		if	(locations	==	null)	{	
 		locations	=	new	Location[0];	
