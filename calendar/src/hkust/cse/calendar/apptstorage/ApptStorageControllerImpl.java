@@ -1,5 +1,6 @@
 package hkust.cse.calendar.apptstorage;
 
+import hkust.cse.calendar.unit.Location;
 import hkust.cse.calendar.unit.Appt;
 import hkust.cse.calendar.unit.TimeSpan;
 import hkust.cse.calendar.unit.User;
@@ -22,7 +23,15 @@ public class ApptStorageControllerImpl {
 	
 	/* The Appt storage */
 	private ApptStorage mApptStorage;
+	
+	public Location[] getLocationList(){
+		return mApptStorage.getLocationList();
+	}
 
+	public void setLocationList(Location[] locations){
+		mApptStorage.setLocationList(locations);
+	}
+	
 	/* Create a new object of ApptStorageControllerImpl from an existing storage of Appt */
 	public ApptStorageControllerImpl(ApptStorage storage) {
 		mApptStorage = storage;

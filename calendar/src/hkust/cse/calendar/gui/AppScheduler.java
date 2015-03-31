@@ -355,6 +355,13 @@ public class AppScheduler extends JDialog implements ActionListener,
 		// Save the appointment to the hard disk
 		int[] date = getValidDate();
 		int[] time = getValidTimeInterval();
+		Timestamp stime = CreateTimeStamp(date, time[0]);	//time[0] is start time
+		Timestamp etime = CreateTimeStamp(date, time[1]);	//time[1] is end time
+		TimeSpan newTimeSpan = new TimeSpan(stime, etime);
+		Appt newAppt = new Appt();
+		newAppt.setTimeSpan(newTimeSpan);
+		newAppt.setTitle(titleField.getText());
+		updateSetApp(newAppt);
 		if(date != null & time != null)
 		setVisible(false);
 	}
@@ -371,7 +378,7 @@ public class AppScheduler extends JDialog implements ActionListener,
 
 	public void updateSetApp(Appt appt) {
 		// Fix Me!
-	}
+		}
 
 	public void componentHidden(ComponentEvent e) {
 

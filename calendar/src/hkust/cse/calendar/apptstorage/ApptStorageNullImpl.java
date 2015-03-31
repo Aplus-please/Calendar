@@ -1,6 +1,7 @@
 package hkust.cse.calendar.apptstorage;
 
 import hkust.cse.calendar.unit.Appt;
+import hkust.cse.calendar.unit.Location;
 import hkust.cse.calendar.unit.TimeSpan;
 import hkust.cse.calendar.unit.User;
 
@@ -59,6 +60,18 @@ public class ApptStorageNullImpl extends ApptStorage {
 	public void LoadApptFromXml() {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public Location[] getLocationList() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setLocationList(Location[] locations) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
