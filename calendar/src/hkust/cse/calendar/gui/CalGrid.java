@@ -86,14 +86,14 @@ public class CalGrid extends JFrame implements ActionListener {
 	private StyledDocument mem_doc = null;
 	private SimpleAttributeSet sab = null;
 	// private boolean isLogin = false;
-	private JMenu Appmenu = new JMenu("Appointment");;
+	private JMenu Appmenu = new JMenu("Appointment");
 
 	private final String[] holidays = {
 			"New Years Day\nSpring Festival\n",
 			"President's Day (US)\n",
 			"",
 			"Ching Ming Festival\nGood Friday\nThe day following Good Friday\nEaster Monday\n",
-			"Labour Day\nThe Buddhaâ€™s Birthday\nTuen Ng Festival\n",
+			"Labour Day\nThe Buddhaþý™s Birthday\nTuen Ng Festival\n",
 			"",
 			"Hong Kong Special Administrative Region Establishment Day\n",
 			"Civic Holiday(CAN)\n",
@@ -325,6 +325,17 @@ public class CalGrid extends JFrame implements ActionListener {
 					tableView.setModel(t);
 					tableView.repaint();
 				}
+				if (e.getActionCommand().equals("Manage Location")) {
+					AppScheduler a = new AppScheduler("New", CalGrid.this);
+					a.updateSetApp(hkust.cse.calendar.gui.Utility
+							.createDefaultAppt(currentY, currentM, currentD,
+									mCurrUser));
+					a.setLocationRelativeTo(null);
+					a.show();
+					TableModel t = prepareTableModel();
+					tableView.setModel(t);
+					tableView.repaint();
+				}
 
 			}
 		};
@@ -379,7 +390,18 @@ public class CalGrid extends JFrame implements ActionListener {
 		mi = new JMenuItem("Manage Locations");
 		mi.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0){
-				LocationsDialog dlg = new LocationsDialog(controller);
+				LocationsDialog dlg = new LocationsDialog();
+				dlg.show();
+				
+			}
+		});
+		Appmenu.add(mi);
+		
+		mi = new JMenuItem("Time Machine");
+		mi.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent arg0){
+				TimeDialog tlg = new TimeDialog();
+				tlg.show();
 				
 			}
 		});

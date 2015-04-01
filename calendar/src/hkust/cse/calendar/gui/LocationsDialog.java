@@ -34,14 +34,15 @@ public class LocationsDialog extends JFrame{
 		contentPane.add(txtAddlocation);
 		contentPane.add(btnAddLocation);
 		setContentPane(contentPane);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		pack();
+		this.setLocationRelativeTo(null);
 		setVisible(true);
 	}
 	public LocationsDialog(ApptStorageControllerImpl controller){
 		_controller = controller;
 		this.setLayout (new BorderLayout());
-		this.setLocationByPlatform(true);
+		
 		this.setSize(300,200);
 		
 		listModel = new DefaultListModel<Location>();
@@ -57,6 +58,9 @@ public class LocationsDialog extends JFrame{
 			}
 			
 		});
+		pack();
+		
+		this.setVisible(true);
 	}
 	
 	

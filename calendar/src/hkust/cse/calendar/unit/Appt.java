@@ -180,6 +180,11 @@ public class Appt implements Serializable {
 		this.isjoint = isjoint;
 	}
 
+	public void printAppt(){
+		System.out.println(getTitle());
+		System.out.println(getInfo());
+		System.out.println(TimeSpan());
+	}
 
 
 }

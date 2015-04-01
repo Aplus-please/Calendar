@@ -1,6 +1,7 @@
 package hkust.cse.calendar.gui;
 
 import hkust.cse.calendar.apptstorage.ApptStorageControllerImpl;
+import hkust.cse.calendar.gui.CalCellRenderer;
 import hkust.cse.calendar.unit.Appt;
 import hkust.cse.calendar.unit.TimeSpan;
 
@@ -400,12 +401,14 @@ public class AppScheduler extends JDialog implements ActionListener,
 		Timestamp stime = CreateTimeStamp(date, time[0]);	//time[0] is start time
 		Timestamp etime = CreateTimeStamp(date, time[1]);	//time[1] is end time
 		TimeSpan newTimeSpan = new TimeSpan(stime, etime);
-		Appt newAppt = new Appt();
-		newAppt.setTimeSpan(newTimeSpan);
-		newAppt.setTitle(titleField.getText());
-		updateSetApp(newAppt);
+		NewAppt.setTimeSpan(newTimeSpan);
+		NewAppt.setTitle(titleField.getText());
+		NewAppt.setInfo(detailArea.getText());
+		NewAppt.printAppt();
+		parent.getAppList().addAppt(NewAppt);
 		if(date != null & time != null)
 		setVisible(false);
+//		setAppt_exist(true);
 	}
 
 	private Timestamp CreateTimeStamp(int[] date, int time) {

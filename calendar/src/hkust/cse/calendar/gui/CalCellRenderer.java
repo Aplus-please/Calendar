@@ -25,6 +25,14 @@ class CalCellRenderer extends DefaultTableCellRenderer
 		setHorizontalAlignment(SwingConstants.RIGHT);
 		setVerticalAlignment(SwingConstants.TOP);
 	}
+	
+	public void ChangeCellColor(int r, int c){
+		setBackground(Color.pink);
+	}
+	
+	public void setAppt_exist(boolean a){
+		Appt_exist = a;
+	}
 
 	public int row() {
 		return r;
