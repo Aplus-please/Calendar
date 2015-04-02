@@ -20,8 +20,6 @@ import javax.swing.border.TitledBorder;
 
 public class TimeDialog extends JFrame {
 
-	private JTextField locNameText;
-
 	private JButton AddBut;
 	private JButton RemoveBut;
 	private JLabel yearL;
@@ -34,13 +32,11 @@ public class TimeDialog extends JFrame {
 	private JTextField sTimeH;
 	private JLabel sTimeML;
 	private JTextField sTimeM;
-	private JLabel eTimeHL;
-	private JTextField eTimeH;
 	private JLabel sTimeSL;
 	private JTextField sTimeS;
 	private TimeMachine tm = new TimeMachine();
 	private Date d = new Date(System.currentTimeMillis());
-	private Calendar cl = Calendar.getInstance();
+	private Calendar c = Calendar.getInstance();
 
 	public TimeDialog() {
 
@@ -50,50 +46,51 @@ public class TimeDialog extends JFrame {
 		this.setSize(300, 200);
 
 		JPanel pDate = new JPanel();
-		Border dateBorder = new TitledBorder(null, "DATE");
+		Border dateBorder = new TitledBorder(null, "Date");
 		pDate.setBorder(dateBorder);
 
-		yearL = new JLabel("YEAR: ");
+		yearL = new JLabel("Year: ");
 		pDate.add(yearL);
 		yearF = new JTextField(6);
 		pDate.add(yearF);
-		monthL = new JLabel("MONTH: ");
+		monthL = new JLabel("Month: ");
 		pDate.add(monthL);
 		monthF = new JTextField(4);
 		pDate.add(monthF);
-		dayL = new JLabel("DAY: ");
+		dayL = new JLabel("Day: ");
 		pDate.add(dayL);
 		dayF = new JTextField(4);
 		pDate.add(dayF);
 
 		JPanel psTime = new JPanel();
-		Border stimeBorder = new TitledBorder(null, "TIME");
+		Border stimeBorder = new TitledBorder(null, "Time");
 		psTime.setBorder(stimeBorder);
-		sTimeHL = new JLabel("Hour");
+		sTimeHL = new JLabel("Hour: ");
 		psTime.add(sTimeHL);
 		sTimeH = new JTextField(4);
 		psTime.add(sTimeH);
-		sTimeML = new JLabel("Minute");
+		sTimeML = new JLabel("Minute: ");
 		psTime.add(sTimeML);
 		sTimeM = new JTextField(4);
 		psTime.add(sTimeM);
-		sTimeSL = new JLabel("Second");
+		sTimeSL = new JLabel("Second: ");
 		psTime.add(sTimeSL);
 		sTimeS = new JTextField(4);
 		psTime.add(sTimeS);
 
+		JPanel subPanel = new JPanel();
 		AddBut = new JButton("Change Time");
 		AddBut.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
-				System.out.println("in time machine");
+//				System.out.println("in time machine");
 				// System.out.println(yearText.getText());
 				// System.out.println(Integer.parseInt(yearText.getText()));
 
 				// System.out.println(Integer.getInteger(yearText.getText()));
-				tm.setTimeMachine(Integer.parseInt(yearF.getText()),
+				tm.setTimeMachine(Integer.parseInt(yearF.getText()), //parse string to int
 						Integer.parseInt(monthF.getText()),
 						Integer.parseInt(dayF.getText()),
 						Integer.parseInt(sTimeH.getText()),
@@ -129,21 +126,23 @@ public class TimeDialog extends JFrame {
 
 		getContentPane().add(psTime, BorderLayout.CENTER);
 		getContentPane().add(pDate, BorderLayout.PAGE_START);
-		getContentPane().add(AddBut, BorderLayout.SOUTH);
-		getContentPane().add(RemoveBut, BorderLayout.EAST);
+		subPanel.add(AddBut);
+		subPanel.add(RemoveBut);
+		getContentPane().add(subPanel, BorderLayout.SOUTH);
+		
 
-		System.out.println(tm.getYear());
-		System.out.println(tm.getMonth());
-		System.out.println(tm.getDate());
-		System.out.println(tm.getHourOfDay());
-		System.out.println(tm.getMinute());
-		System.out.println(tm.getSecond());
-		System.out.println(d.getYear());
-		System.out.println(d.getMonth());
-		System.out.println(d.getDate());
-		System.out.println(d.getHours());
-		System.out.println(d.getMinutes());
-		System.out.println(d.getSeconds());
+//		System.out.println(tm.getYear());
+//		System.out.println(tm.getMonth());
+//		System.out.println(tm.getDate());
+//		System.out.println(tm.getHourOfDay());
+//		System.out.println(tm.getMinute());
+//		System.out.println(tm.getSecond());
+//		System.out.println(d.getYear());
+//		System.out.println(d.getMonth());
+//		System.out.println(d.getDate());
+//		System.out.println(d.getHours());
+//		System.out.println(d.getMinutes());
+//		System.out.println(d.getSeconds());
 		// set(Calendar.MARCH,Calendar.SEPTEMBER);
 
 		pack();

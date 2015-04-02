@@ -1,6 +1,7 @@
 package hkust.cse.calendar.gui;
 
 import hkust.cse.calendar.apptstorage.ApptStorageControllerImpl;
+import hkust.cse.calendar.gui.AppList;
 import hkust.cse.calendar.gui.CalCellRenderer;
 import hkust.cse.calendar.unit.Appt;
 import hkust.cse.calendar.unit.TimeSpan;
@@ -19,6 +20,7 @@ import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -37,11 +39,13 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
+import javax.swing.table.TableCellRenderer;
 
 import hkust.cse.calendar.unit.Location;;
 
@@ -392,6 +396,13 @@ public class AppScheduler extends JDialog implements ActionListener,
 
 		return result;
 	}
+	
+	private boolean isPastEvent(Appt appt){
+		Calendar calendar = Calendar.getInstance();
+		java.util.Date now = calendar.getTime();
+		java.sql.Timestamp current = new java.sql.Timestamp(now.getTime());
+		return appt.TimeSpan().StartTime().before(current);
+	}
 
 	private void saveButtonResponse() {
 		// Fix Me!
@@ -404,8 +415,29 @@ public class AppScheduler extends JDialog implements ActionListener,
 		NewAppt.setTimeSpan(newTimeSpan);
 		NewAppt.setTitle(titleField.getText());
 		NewAppt.setInfo(detailArea.getText());
+		if(isPastEvent(NewAppt)){
+			JOptionPane.showMessageDialog(this, "Cannot input past time!",
+					"Input Error", JOptionPane.ERROR_MESSAGE);
+		}
 		NewAppt.printAppt();
-		parent.getAppList().addAppt(NewAppt);
+		int [] pos = new int[2];
+		if(NewAppt.TimeSpan().StartTime().getDate()==14){
+			System.out.println("Now set callcell = 2");
+			CalCellRenderer.row = 2;
+			CalCellRenderer.col = 2;
+		}
+		if(CalCellRenderer.row==2&&CalCellRenderer.col==2)
+		{
+			System.out.println("Now set callcell is 2");
+			CalCellRenderer.state=(CalCellRenderer.state+1)%2;
+		}
+		else
+		{
+			CalCellRenderer.state=1;
+			CalCellRenderer.row=2;
+			CalCellRenderer.col=2;	
+		}
+		parent.tableView.repaint();
 		if(date != null & time != null)
 		setVisible(false);
 //		setAppt_exist(true);
@@ -424,16 +456,18 @@ public class AppScheduler extends JDialog implements ActionListener,
 	public void updateSetApp(Appt appt) {
 		// Fix Me!
 		titleField.setText(appt.getTitle());
-		  detailArea.setText(appt.getInfo());
-		  sTimeH.setText(String.valueOf(appt.TimeSpan().StartTime().getHours()));
-		  sTimeM.setText(String.valueOf(appt.TimeSpan().StartTime().getMinutes()));
-		  eTimeH.setText(String.valueOf(appt.TimeSpan().EndTime().getHours()));
-		  eTimeM.setText(String.valueOf(appt.TimeSpan().EndTime().getMinutes()));
-		  yearF.setText(String.valueOf(appt.TimeSpan().StartTime().getYear()+1900));
-		  monthF.setText(String.valueOf(appt.TimeSpan().StartTime().getMonth()+1));
-		  dayF.setText(String.valueOf(appt.TimeSpan().StartTime().getDate()));
-		  System.out.println("testing");
-		}
+		detailArea.setText(appt.getInfo());
+		sTimeH.setText(String.valueOf(appt.TimeSpan().StartTime().getHours()));
+		sTimeM.setText(String.valueOf(appt.TimeSpan().StartTime().getMinutes()));
+		eTimeH.setText(String.valueOf(appt.TimeSpan().EndTime().getHours()));
+		eTimeM.setText(String.valueOf(appt.TimeSpan().EndTime().getMinutes()));
+		yearF.setText(String
+				.valueOf(appt.TimeSpan().StartTime().getYear() + 1900));
+		monthF.setText(String
+				.valueOf(appt.TimeSpan().StartTime().getMonth() + 1));
+		dayF.setText(String.valueOf(appt.TimeSpan().StartTime().getDate()));
+
+	}
 
 	public void componentHidden(ComponentEvent e) {
 

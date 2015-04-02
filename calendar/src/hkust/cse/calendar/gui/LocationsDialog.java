@@ -15,7 +15,8 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-public class LocationsDialog extends JFrame{
+
+public class LocationsDialog extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private ApptStorageControllerImpl _controller;
 	private DefaultListModel<Location> listModel;
@@ -24,12 +25,20 @@ public class LocationsDialog extends JFrame{
 	private JLabel lblAddLocation;
 	private JTextField txtAddlocation;
 	private JButton btnAddLocation;
-	public LocationsDialog(){
+
+	public LocationsDialog() {
 		setTitle("Location Dialog");
 		JPanel contentPane = new JPanel();
+		listModel = new DefaultListModel<Location>();
+		list = new JList<Location>(listModel);
+		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		list.setSelectedIndex(0);
+		list.setVisibleRowCount(5);
+//		setBorder(BorderFactory.createTitledBorder("Pizza"));
 		lblAddLocation = new JLabel("Add Location:");
 		txtAddlocation = new JTextField(20);
 		btnAddLocation = new JButton("Add");
+		contentPane.add(list);
 		contentPane.add(lblAddLocation);
 		contentPane.add(txtAddlocation);
 		contentPane.add(btnAddLocation);
@@ -39,31 +48,29 @@ public class LocationsDialog extends JFrame{
 		this.setLocationRelativeTo(null);
 		setVisible(true);
 	}
-	public LocationsDialog(ApptStorageControllerImpl controller){
+
+	public LocationsDialog(ApptStorageControllerImpl controller) {
 		_controller = controller;
-		this.setLayout (new BorderLayout());
-		
-		this.setSize(300,200);
-		
+		getContentPane().setLayout(new BorderLayout());
+
+		this.setSize(300, 200);
+
 		listModel = new DefaultListModel<Location>();
 		list = new JList<Location>(listModel);
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		list.setSelectedIndex(0);
-		list.addListSelectionListener(new ListSelectionListener(){
+		list.addListSelectionListener(new ListSelectionListener() {
 
 			@Override
 			public void valueChanged(ListSelectionEvent arg0) {
 				// TODO Auto-generated method stub
-				
+
 			}
-			
+
 		});
 		pack();
-		
+
 		this.setVisible(true);
 	}
-	
-	
-	
 
 }

@@ -2,6 +2,9 @@ package hkust.cse.calendar.gui;
 
 import hkust.cse.calendar.apptstorage.ApptStorageControllerImpl;
 import hkust.cse.calendar.unit.Appt;
+import hkust.cse.calendar.unit.TimeMachine;
+import hkust.cse.calendar.unit.TimeSpan;
+import hkust.cse.calendar.unit.User;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -12,8 +15,16 @@ import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
 import javax.swing.BorderFactory;
+import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -34,7 +45,8 @@ import javax.swing.table.TableModel;
 class AppCellRenderer extends DefaultTableCellRenderer {
 	private int r;
 	private int c;
-
+	
+	public static int row=-1,col=-1;
 	// public final static int EARLIEST_TIME = 480;
 	//
 	// public final static int LATEST_TIME = 1050;
@@ -43,16 +55,22 @@ class AppCellRenderer extends DefaultTableCellRenderer {
 	// 30,
 	// 31, 30, 31 };
 
-	public AppCellRenderer(Object value, boolean override, int row, int col, //Constructor
+	public AppCellRenderer(Object value, boolean override, int row, int col,
 			int colorCMD, Color currColor) {
-
+		
 		Font f1 = new Font("Helvetica", Font.ITALIC, 11);
 		if (override) {
-			if (row % 2 == 0) // If number of row is even
+			if (row % 2 == 0)
 				setBackground(new Color(153, 204, 255));
 			else
 				setBackground(new Color(204, 204, 255));
 			setForeground(Color.black);
+			if(r==row&&c==col)
+				setBackground(Color.green);
+
+			else setBackground(Color.white);
+			setHorizontalAlignment(SwingConstants.RIGHT);
+			setVerticalAlignment(SwingConstants.TOP);
 
 		}
 		if (col == 2 || col == 5)
@@ -112,7 +130,9 @@ public class AppList extends JPanel implements ActionListener {
 	private Color[][] cellColor = new Color[20][2];
 	public Appt selectedAppt=null;
 	private MouseEvent tempe;
-	public AppList() {	//Constructor
+
+	
+	public AppList() {
 		setLayout(new BorderLayout());
 		currentRow = 0;
 		currentCol = 0;
@@ -203,8 +223,19 @@ public class AppList extends JPanel implements ActionListener {
 		JTableHeader h = tableView.getTableHeader();
 		h.setResizingAllowed(true);
 		h.setReorderingAllowed(false);
-
+		
 		tableView.addMouseListener(new MouseAdapter() {
+
+			public void mousePressed(MouseEvent e) {
+				mousePressResponse();
+			}
+
+			public void mouseReleased(MouseEvent e) {
+				mouseResponse();
+			}
+		});
+
+/*		tableView.addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
 				pressResponse(e);
 			}
@@ -214,7 +245,7 @@ public class AppList extends JPanel implements ActionListener {
 				if(e.getButton()==1)
 				calculateDrag(e);
 			}
-		});
+		}); */
 
 		JScrollPane scrollpane = new JScrollPane(tableView);
 		scrollpane.setBorder(new BevelBorder(BevelBorder.LOWERED));
@@ -412,20 +443,129 @@ public class AppList extends JPanel implements ActionListener {
 
 	}
 
+	//for delete and modify
+	
+	private boolean permissiontoedit(Appt appt){
+		try{
+		String name=parent.mCurrUser.ID();
+		int apptid=appt.getID();
+		String line;
+    	BufferedReader fr=new BufferedReader(new FileReader("appt_list.txt"));
+    	while((line=fr.readLine())!=null){
+    		String[] splited = line.split("\\|");
+    		if (Integer.parseInt(splited[0])==apptid&&splited[6].equals(name)){
+    			fr.close();
+    			return true;
+    		}
+    	}
+    	fr.close();
+    }catch (FileNotFoundException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+    } catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+		return false;
+	}
+	Calendar calendar = Calendar.getInstance();
+	java.util.Date currenttime = calendar.getTime();
+	TimeMachine tm = new TimeMachine();
 	private void delete() {
 
+		
+		Appt apptTitle = getSelectedAppTitle();
+
+	
+		if (apptTitle == null)
+			return;
+		if(!permissiontoedit(apptTitle))return;
+		if(tm.isEnable()){
+			int year=tm.getYear();
+			int month=tm.getMonth();
+			int date=tm.getDate();
+			int hour=tm.getHourOfDay();
+			int minute=tm.getMinute();
+			int second=tm.getSecond();
+			
+			if (apptTitle.TimeSpan().EndTime().getYear()<(year-1900))
+				return;
+			if(apptTitle.TimeSpan().EndTime().getYear()==year){
+				if (apptTitle.TimeSpan().EndTime().getMonth()<month)
+					return;
+			}
+			
+				
+			if(apptTitle.TimeSpan().EndTime().getMonth()==month){
+				if (apptTitle.TimeSpan().EndTime().getDate()<date)
+					return;
+			}
+	
+			if(apptTitle.TimeSpan().EndTime().getDate()==date){
+				if (apptTitle.TimeSpan().EndTime().getHours()<hour)
+					return;
+			}
+			
+			if(apptTitle.TimeSpan().EndTime().getHours()==hour){
+				if (apptTitle.TimeSpan().EndTime().getMinutes()<minute)
+					return;
+			}
+			
+		}
+		else{
+		if (apptTitle.TimeSpan().EndTime().before(currenttime))	// If the time span ends before or at the starting time of this time span then these two time spans do not overlap
+			return;
+		}
+		AppScheduler setAppDial = new AppScheduler("Delete", parent, apptTitle.getID());
+//		setAppDial.deleteapp();
+		System.out.println("applistdel");
 	}
 
 	private void modify() {
 		Appt apptTitle = getSelectedAppTitle();
 		if (apptTitle == null)
 			return;
+		if(!permissiontoedit(apptTitle))return;
+		if(tm.isEnable()){
+			int year=tm.getYear();
+			int month=tm.getMonth();
+			int date=tm.getDate();
+			int hour=tm.getHourOfDay();
+			int minute=tm.getMinute();
+			int second=tm.getSecond();
+			
+			if (apptTitle.TimeSpan().EndTime().getYear()<(year-1900))
+				return;
+			if(apptTitle.TimeSpan().EndTime().getYear()==year){
+				if (apptTitle.TimeSpan().EndTime().getMonth()<month)
+					return;
+			}
+			
+				
+			if(apptTitle.TimeSpan().EndTime().getMonth()==month){
+				if (apptTitle.TimeSpan().EndTime().getDate()<date)
+					return;
+			}
+	
+			if(apptTitle.TimeSpan().EndTime().getDate()==date){
+				if (apptTitle.TimeSpan().EndTime().getHours()<hour)
+					return;
+			}
+			
+			if(apptTitle.TimeSpan().EndTime().getHours()==hour){
+				if (apptTitle.TimeSpan().EndTime().getMinutes()<minute)
+					return;
+			}
+			
+		}
+		else{
+		if (apptTitle.TimeSpan().EndTime().before(currenttime))	// If the time span ends before or at the starting time of this time span then these two time spans do not overlap
+			return;
+		}
 		AppScheduler setAppDial = new AppScheduler("Modify", parent, apptTitle.getID());
-
 		setAppDial.updateSetApp(apptTitle);
 		setAppDial.show();
 		setAppDial.setResizable(false);
-
 	}
 
 	public Appt getSelectedAppTitle() {
@@ -459,6 +599,7 @@ public class AppList extends JPanel implements ActionListener {
 	}
 	
 	private void NewAppt() {
+		
 		
 		if (parent.mCurrUser == null)
 			return;
@@ -522,6 +663,57 @@ public class AppList extends JPanel implements ActionListener {
 
 		}
 		
+	}
+	
+	public User mCurrUser;
+	private String mCurrTitle = "Desktop Calendar - No User - ";
+	private GregorianCalendar today;
+	public int currentD;
+	public int currentM;
+	public int currentY;
+	public int previousRow;
+	public int previousCol;
+	private AppList applist;
+
+	private void mousePressResponse() {
+		previousRow = tableView.getSelectedRow();
+		previousCol = tableView.getSelectedColumn();
+	}
+	
+	private void mouseResponse() {
+		System.out.println("tag");
+		int[] selectedRows = tableView.getSelectedRows();
+		int[] selectedCols = tableView.getSelectedColumns();
+		if(tableView.getSelectedRow() == previousRow && tableView.getSelectedColumn() == previousCol){
+			currentRow = selectedRows[selectedRows.length - 1];
+			currentCol = selectedCols[selectedCols.length - 1];
+		}
+		else if(tableView.getSelectedRow() != previousRow && tableView.getSelectedColumn() == previousCol){
+			currentRow = tableView.getSelectedRow();
+			currentCol = selectedCols[selectedCols.length - 1];
+		}
+		else if(tableView.getSelectedRow() == previousRow && tableView.getSelectedColumn() != previousCol){
+			currentRow = selectedRows[selectedRows.length - 1];
+			currentCol = tableView.getSelectedColumn();
+		}
+		else{
+			currentRow = tableView.getSelectedRow();
+			currentCol = tableView.getSelectedColumn();
+		}
+		
+		if (currentRow > 5 || currentRow < 0 || currentCol < 0
+				|| currentCol > 6)
+			return;
+		if (tableView.getModel().getValueAt(currentRow, currentCol) != "")
+			try {
+				currentD = new Integer((String) tableView.getModel()
+						.getValueAt(currentRow, currentCol)).intValue();
+			} catch (NumberFormatException n) {
+				return;
+			}
+		AppCellRenderer.row=currentRow;
+		AppCellRenderer.col=currentCol;	
+		tableView.repaint();
 	}
 
 }

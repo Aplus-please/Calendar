@@ -1,7 +1,7 @@
 package hkust.cse.calendar.unit;
 
 public class Location {
-	private String name;
+	private String name = "ust";
 	
 	public Location(String newName){
 		name = newName;

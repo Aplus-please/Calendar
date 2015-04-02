@@ -3,6 +3,7 @@ package hkust.cse.calendar.gui;
 import hkust.cse.calendar.Main.CalendarMain;
 import hkust.cse.calendar.apptstorage.ApptStorageControllerImpl;
 import hkust.cse.calendar.unit.Appt;
+import hkust.cse.calendar.unit.TimeMachine;
 import hkust.cse.calendar.unit.TimeSpan;
 import hkust.cse.calendar.unit.User;
 
@@ -20,6 +21,7 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Vector;
 
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -46,7 +48,6 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
-
 public class CalGrid extends JFrame implements ActionListener {
 
 	// private User mNewUser;
@@ -66,15 +67,17 @@ public class CalGrid extends JFrame implements ActionListener {
 	private BasicArrowButton wButton;
 	private JLabel year;
 	private JComboBox month;
+	private TimeMachine tm = new TimeMachine();
 
+	private final Color[][] cellColor = new Color[6][7];
 	private final Object[][] data = new Object[6][7];
-	//private final Vector[][] apptMarker = new Vector[6][7];
+	private final Vector<Appt>[][] apptMarker = new Vector[6][7];
 	private final String[] names = { "Sunday", "Monday", "Tuesday",
 			"Wednesday", "Thursday", "Friday", "Saturday" };
 	private final String[] months = { "January", "Feburary", "March", "April",
 			"May", "June", "July", "August", "September", "October",
 			"November", "December" };
-	private JTable tableView;
+	public JTable tableView;
 	private AppList applist;
 	public static final int[] monthDays = { 31, 28, 31, 30, 31, 30, 31, 31, 30,
 			31, 30, 31 };
@@ -110,7 +113,7 @@ public class CalGrid extends JFrame implements ActionListener {
 			public void windowClosing(WindowEvent e) {
 				System.exit(0);
 			}
-		});
+		}); // end of window listener
 
 		controller = con;
 		mCurrUser = null;
@@ -132,6 +135,47 @@ public class CalGrid extends JFrame implements ActionListener {
 		currentM = 12;
 
 		getDateArray(data);
+
+		// Time Machine
+		final JLabel timeMachineL = new JLabel(today.getTime().toString());
+		this.add(timeMachineL, BorderLayout.SOUTH); // position of time display
+
+		javax.swing.Timer timer = new javax.swing.Timer(1000,
+				new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						int tempY = today.get(today.YEAR);
+						int tempD = today.get(today.DATE);
+						int tempM = today.get(today.MONTH);
+						Calendar calendar = Calendar.getInstance();
+
+						// boolean to trigger the time machine here
+						if (tm.isEnable()) {
+							calendar.set(tm.getYear(), tm.getMonth(),
+									tm.getDate(), tm.getHourOfDay(),
+									tm.getMinute(), tm.getSecond());
+						}
+						today = new GregorianCalendar(
+								calendar.get(Calendar.YEAR),
+								calendar.get(Calendar.MONTH),
+								calendar.get(Calendar.DATE),
+								calendar.get(Calendar.HOUR_OF_DAY),
+								calendar.get(Calendar.MINUTE),
+								calendar.get(Calendar.SECOND));
+						timeMachineL.setText(today.getTime().toString());
+						if (tempM != today.get(today.MONTH)
+								|| tempD != today.get(today.DATE)
+								|| tempY != today.get(today.YEAR)) {
+							getDateArray(data);
+							if (tableView != null) {
+								TableModel t = prepareTableModel();
+								tableView.setModel(t);
+								tableView.repaint();
+							}
+						}
+					}
+				});
+		timer.start();
+		// End of Time Machine
 
 		JPanel leftP = new JPanel();
 		leftP.setLayout(new BorderLayout());
@@ -181,7 +225,7 @@ public class CalGrid extends JFrame implements ActionListener {
 		leftP.add(yearGroup, BorderLayout.NORTH);
 
 		TableModel dataModel = prepareTableModel();
-		
+
 		tableView = new JTable(dataModel) {
 			public TableCellRenderer getCellRenderer(int row, int col) {
 				String tem = (String) data[row][col];
@@ -192,14 +236,14 @@ public class CalGrid extends JFrame implements ActionListener {
 								&& today.get(today.MONTH) + 1 == currentM
 								&& today.get(today.DAY_OF_MONTH) == Integer
 										.parseInt(tem)) {
-							return new CalCellRenderer(today);
+							return new CalCellRenderer(today, row, col);
 						}
 					} catch (Throwable e) {
 						System.exit(1);
 					}
 
 				}
-				return new CalCellRenderer(null);
+				return new CalCellRenderer(null, row, col);
 			}
 		};
 
@@ -230,14 +274,13 @@ public class CalGrid extends JFrame implements ActionListener {
 		whole = new JSplitPane(JSplitPane.VERTICAL_SPLIT, upper, applist);
 		getContentPane().add(whole);
 
-		
 		initializeSystem(); // for you to add.
-		//mCurrUser = getCurrUser(); // totally meaningless code
+		// mCurrUser = getCurrUser(); // totally meaningless code
 		Appmenu.setEnabled(true);
 
 		UpdateCal();
-		pack();				// sized the window to a preferred size
-		setVisible(true);	//set the window to be visible
+		pack(); // sized the window to a preferred size
+		setVisible(true); // set the window to be visible
 	}
 
 	public TableModel prepareTableModel() {
@@ -348,23 +391,26 @@ public class CalGrid extends JFrame implements ActionListener {
 		Access.getAccessibleContext().setAccessibleDescription(
 				"Account Access Management");
 
-		mi = (JMenuItem) Access.add(new JMenuItem("Logout"));	//adding a Logout menu button for user to logout
+		mi = (JMenuItem) Access.add(new JMenuItem("Logout")); // adding a Logout
+																// menu button
+																// for user to
+																// logout
 		mi.setMnemonic('L');
 		mi.getAccessibleContext().setAccessibleDescription("For user logout");
 		mi.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int n = JOptionPane.showConfirmDialog(null, "Logout?",
 						"Comfirm", JOptionPane.YES_NO_OPTION);
-				if (n == JOptionPane.YES_OPTION){
-					//controller.dumpStorageToFile();
-					//System.out.println("closed");
+				if (n == JOptionPane.YES_OPTION) {
+					// controller.dumpStorageToFile();
+					// System.out.println("closed");
 					dispose();
 					CalendarMain.logOut = true;
-					return;	//return to CalendarMain()
+					return; // return to CalendarMain()
 				}
 			}
 		});
-		
+
 		mi = (JMenuItem) Access.add(new JMenuItem("Exit"));
 		mi.setMnemonic('E');
 		mi.getAccessibleContext().setAccessibleDescription("Exit Program");
@@ -386,23 +432,23 @@ public class CalGrid extends JFrame implements ActionListener {
 		mi = new JMenuItem("Manual Scheduling");
 		mi.addActionListener(listener);
 		Appmenu.add(mi);
-		
+
 		mi = new JMenuItem("Manage Locations");
-		mi.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent arg0){
+		mi.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
 				LocationsDialog dlg = new LocationsDialog();
 				dlg.show();
-				
+
 			}
 		});
 		Appmenu.add(mi);
-		
+
 		mi = new JMenuItem("Time Machine");
-		mi.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent arg0){
+		mi.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
 				TimeDialog tlg = new TimeDialog();
 				tlg.show();
-				
+
 			}
 		});
 
@@ -412,8 +458,9 @@ public class CalGrid extends JFrame implements ActionListener {
 
 	private void initializeSystem() {
 
-		mCurrUser = this.controller.getDefaultUser();	//get User from controller
-		controller.LoadApptFromXml();
+		// mCurrUser = this.controller.getDefaultUser(); //get User from
+		// controller
+		// controller.LoadApptFromXml();
 		// Fix Me !
 		// Load the saved appointments from disk
 		checkUpdateJoinAppt();
@@ -489,9 +536,9 @@ public class CalGrid extends JFrame implements ActionListener {
 			Appt[] monthAppts = null;
 			GetMonthAppts();
 
-//			for (int i = 0; i < 6; i++)
-//				for (int j = 0; j < 7; j++)
-//					apptMarker[i][j] = new Vector(10, 1);
+			// for (int i = 0; i < 6; i++)
+			// for (int j = 0; j < 7; j++)
+			// apptMarker[i][j] = new Vector(10, 1);
 
 			TableModel t = prepareTableModel();
 			this.tableView.setModel(t);
@@ -500,15 +547,15 @@ public class CalGrid extends JFrame implements ActionListener {
 		}
 	}
 
-//	public void clear() {
-//		for (int i = 0; i < 6; i++)
-//			for (int j = 0; j < 7; j++)
-//				apptMarker[i][j] = new Vector(10, 1);
-//		TableModel t = prepareTableModel();
-//		tableView.setModel(t);
-//		tableView.repaint();
-//		applist.clear();
-//	}
+	// public void clear() {
+	// for (int i = 0; i < 6; i++)
+	// for (int j = 0; j < 7; j++)
+	// apptMarker[i][j] = new Vector(10, 1);
+	// TableModel t = prepareTableModel();
+	// tableView.setModel(t);
+	// tableView.repaint();
+	// applist.clear();
+	// }
 
 	private Appt[] GetMonthAppts() {
 		Timestamp start = new Timestamp(0);
@@ -530,27 +577,27 @@ public class CalGrid extends JFrame implements ActionListener {
 		previousRow = tableView.getSelectedRow();
 		previousCol = tableView.getSelectedColumn();
 	}
-	
+
 	private void mouseResponse() {
 		int[] selectedRows = tableView.getSelectedRows();
 		int[] selectedCols = tableView.getSelectedColumns();
-		if(tableView.getSelectedRow() == previousRow && tableView.getSelectedColumn() == previousCol){
+		if (tableView.getSelectedRow() == previousRow
+				&& tableView.getSelectedColumn() == previousCol) {
 			currentRow = selectedRows[selectedRows.length - 1];
 			currentCol = selectedCols[selectedCols.length - 1];
-		}
-		else if(tableView.getSelectedRow() != previousRow && tableView.getSelectedColumn() == previousCol){
+		} else if (tableView.getSelectedRow() != previousRow
+				&& tableView.getSelectedColumn() == previousCol) {
 			currentRow = tableView.getSelectedRow();
 			currentCol = selectedCols[selectedCols.length - 1];
-		}
-		else if(tableView.getSelectedRow() == previousRow && tableView.getSelectedColumn() != previousCol){
+		} else if (tableView.getSelectedRow() == previousRow
+				&& tableView.getSelectedColumn() != previousCol) {
 			currentRow = selectedRows[selectedRows.length - 1];
 			currentCol = tableView.getSelectedColumn();
-		}
-		else{
+		} else {
 			currentRow = tableView.getSelectedRow();
 			currentCol = tableView.getSelectedColumn();
 		}
-		
+
 		if (currentRow > 5 || currentRow < 0 || currentCol < 0
 				|| currentCol > 6)
 			return;
@@ -565,6 +612,15 @@ public class CalGrid extends JFrame implements ActionListener {
 		CalGrid.this.setTitle(mCurrTitle + "(" + currentY + "-" + currentM
 				+ "-" + currentD + ")");
 		updateAppList();
+		if (CalCellRenderer.row == currentRow
+				&& CalCellRenderer.col == currentCol) {
+			CalCellRenderer.state = (CalCellRenderer.state + 1) % 5;
+		} else {
+			CalCellRenderer.state = 1;
+			CalCellRenderer.row = currentRow;
+			CalCellRenderer.col = currentCol;
+		}
+		tableView.repaint();
 	}
 
 	public boolean IsTodayAppt(Appt appt) {
@@ -592,20 +648,20 @@ public class CalGrid extends JFrame implements ActionListener {
 		temp = new Integer(currentD);
 		Timestamp start = new Timestamp(0);
 		start.setYear(currentY);
-		start.setMonth(currentM-1);
+		start.setMonth(currentM - 1);
 		start.setDate(currentD);
 		start.setHours(0);
 		start.setMinutes(0);
 		start.setSeconds(0);
-		
+
 		Timestamp end = new Timestamp(0);
 		end.setYear(currentY);
-		end.setMonth(currentM-1);
+		end.setMonth(currentM - 1);
 		end.setDate(currentD);
 		end.setHours(23);
 		end.setMinutes(59);
 		end.setSeconds(59);
-		
+
 		TimeSpan period = new TimeSpan(start, end);
 		return controller.RetrieveAppts(mCurrUser, period);
 	}
@@ -617,10 +673,58 @@ public class CalGrid extends JFrame implements ActionListener {
 	public User getCurrUser() {
 		return mCurrUser;
 	}
-	
+
 	// check for any invite or update from join appointment
-	public void checkUpdateJoinAppt(){
+	public void checkUpdateJoinAppt() {
 		// Fix Me!
 	}
 
+//	public Appt[] GetApptByYMD(int y, int m, int d) {
+//		Integer temp;
+//		temp = new Integer(d);
+//		Timestamp start = new Timestamp(0);
+//		start.setYear(y);
+//		start.setMonth(m - 1);
+//		start.setDate(d);
+//		start.setHours(0);
+//		start.setMinutes(0);
+//		start.setSeconds(0);
+//
+//		Timestamp end = new Timestamp(0);
+//		end.setYear(y);
+//		end.setMonth(m - 1);
+//		end.setDate(d);
+//		end.setHours(23);
+//		end.setMinutes(59);
+//		end.setSeconds(59);
+//
+//		TimeSpan period = new TimeSpan(start, end);
+//		// edit
+//
+//	}
+//
+//	public void setAllCellColor() {[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[
+//		for (int i = 0; i < 6; i++) {
+//			for (int j = 0; j < 7; j++) {
+//				String tem = (String) data[i][j];
+//				if (tem.equals("") == false) {
+//					cellColor[i][j] = Color.white;
+//				} else
+//					cellColor[i][j] = Color.lightGray;
+//				int y = currentY;
+//				int m = currentM;
+//				int d = 0;
+//				if (!((String) data[i][j]).equals(""))
+//					d = Integer.parseInt((String) data[i][j]);
+//				if (((String) data[i][j]).equals(Integer.toString(currentD)))
+//					cellColor[i][j] = Color.cyan;
+//				if (!(y == 0 || m == 0 || d == 0)) {
+//					Appt[] appt = GetApptByYMD(y, m, d);
+//					if (appt != null && appt.length > 0)
+//						cellColor[i][j] = Color.yellow;
+//				}
+//			}
+//		}
+//
+//	}
 }
