@@ -87,8 +87,8 @@ public class ApptStorageNullImpl extends ApptStorage {
 		defaultUser = entity;
 		for (Object key : mAppts.keySet()){
 			Appt tmpAppt = mAppts.get(key);
-			if((tmpAppt.getusername().equals(defaultUser.ID()) && tmpAppt.TimeSpan().Overlap(time))||
-					((tmpAppt.isPrivate())==true) && tmpAppt.TimeSpan().Overlap(time)){
+			if(((tmpAppt.getusername().equals(defaultUser.ID()) && tmpAppt.TimeSpan().Overlap(time))||
+					((tmpAppt.isPublic())==true) && tmpAppt.TimeSpan().Overlap(time)) && tmpAppt.getWaitingList().isEmpty()){
 				tmpApptLL.add(tmpAppt);
 			}
 		}
@@ -277,7 +277,7 @@ public class ApptStorageNullImpl extends ApptStorage {
 				}else{
 					writer.write("EmptyRejectList" + "|");
 				}
-				writer.write(mAppts.get(key).isPrivate()+"|");
+				writer.write(mAppts.get(key).isPublic()+"|");
 				writer.write("\n");
 			}
 			writer.close();
@@ -293,8 +293,17 @@ public class ApptStorageNullImpl extends ApptStorage {
 
 	@Override
 	public Appt[] RetrieveAppts(Location location) {
-		// TODO Auto-generated method stub
-		return null;
+		LinkedList<Appt> tmpApptLL = new LinkedList<Appt>();
+		for(Object key : mAppts.keySet()){
+			if(mAppts.get(key).getLocation().getName().equals(location.getName()))
+				tmpApptLL.add(mAppts.get(key));
+		}
+		if(tmpApptLL.isEmpty()){
+			return null;
+		}
+		Appt[] apptArray = new Appt[tmpApptLL.size()];
+		apptArray = tmpApptLL.toArray(new Appt[tmpApptLL.size()]);
+		return apptArray;
 	}
 	
 	

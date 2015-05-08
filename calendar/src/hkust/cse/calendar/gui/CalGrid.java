@@ -331,7 +331,6 @@ public class CalGrid extends JFrame implements ActionListener {
 								(sameUserAppts[j].getWaitingList().contains(us.user[i]))||
 									(sameUserAppts[j].getRejectList().contains(us.user[i]))){
 										RemoveUserDialog rld = new RemoveUserDialog(sameUserAppts[j], us.user[i], this);
-										CalendarMain.logOut = true;
 										return; // return to CalendarMain()
 										}
 						}

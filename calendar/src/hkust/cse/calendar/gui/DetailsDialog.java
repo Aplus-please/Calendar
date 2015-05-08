@@ -125,7 +125,7 @@ public class DetailsDialog extends JFrame implements ActionListener {
 		}
 
 		area.append("\n\nDescription: \n" + appt.getInfo());
-		if ((appt.isPrivate())==true)
+		if ((appt.isPublic())==true)
 			area.append("\n\nPrivacy: Public");
 		else
 			area.append("\n\nPrivacy: Private");

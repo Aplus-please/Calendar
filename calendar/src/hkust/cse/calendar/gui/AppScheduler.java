@@ -31,6 +31,7 @@ import java.util.Scanner;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -57,6 +58,9 @@ public class AppScheduler extends JDialog implements ActionListener,
 
 	private	JComboBox invitelistF;
 	private JLabel invitelistL;
+	private	JComboBox SuitableTimeF;
+	private JLabel SuitableTimeL;
+
 	
 	private	JComboBox locationF;
 	private JLabel locationL;
@@ -82,6 +86,7 @@ public class AppScheduler extends JDialog implements ActionListener,
 	private JButton CancelBut;
 	private JButton inviteBut;
 	private JButton rejectBut;
+	private JButton avaTimeBut;
 	
 	private LinkedList<User> userLL;
 	private LinkedList<Location> locationLL;
@@ -101,7 +106,7 @@ public class AppScheduler extends JDialog implements ActionListener,
 	private JTextArea detailArea;
 
 	private boolean priornot;
-	boolean validInput = true;
+	boolean validInput = false;
 	
 	private JCheckBox publicbox;
 	private JLabel publiclabel;
@@ -265,7 +270,12 @@ public class AppScheduler extends JDialog implements ActionListener,
 //			userArray[a] = userLL.get(i).ID();
 //		    a++;
 //		}
-
+		
+		SuitableTimeL = new JLabel("SuitableTimeList: ");
+		SuitableTimeF = new JComboBox();
+		panel2.add(SuitableTimeL);
+		panel2.add(SuitableTimeF);
+		
 		invitelistL = new JLabel("User list: ");
 		invitelistF = new JComboBox(us.getAllUsername());
 		invitelistF.removeItem(parent.controller.getusername());
@@ -276,6 +286,10 @@ public class AppScheduler extends JDialog implements ActionListener,
 		inviteBut = new JButton("Invite");
 		inviteBut.addActionListener(this);
 		panel2.add(inviteBut);
+		
+		avaTimeBut = new JButton("Ava-time");
+		avaTimeBut.addActionListener(this);
+		panel2.add(avaTimeBut);
 		
 		JLabel publiclabel = new JLabel("Public");
 		publicbox = new JCheckBox("", false);
@@ -359,6 +373,8 @@ public class AppScheduler extends JDialog implements ActionListener,
 				this.setVisible(false);
 				dispose();
 			}
+		}	else if (e.getSource() == avaTimeBut){
+			avaButtionResponse();
 		}
 		parent.getAppList().clear();
 		parent.getAppList().setTodayAppt(parent.GetTodayAppt());
@@ -368,15 +384,66 @@ public class AppScheduler extends JDialog implements ActionListener,
 		}
 	}
 
+	private void avaButtionResponse() {
+		String[] AllTimeHere = { "0800-0815", "0815-0830", "0830-0845",
+				"0845-0900", "0900-0915", "0915-0930", "0930-0945",
+				"0945-1000", "1000-1015", "1015-1030", "1030-1045",
+				"1045-1100", "1100-1115", "1115-1130", "1130-1145",
+				"1145-1200", "1200-1215", "1215-1230", "1230-1245",
+				"1245-1300", "1300-1315", "1315-1330", "1330-1345",
+				"1345-1400", "1400-1415", "1415-1430", "1430-1445",
+				"1445-1500", "1500-1515", "1515-1530", "1530-1545",
+				"1545-1600", "1600-1615", "1615-1630", "1630-1645",
+				"1645-1700", "1700-1715", "1715-1730", "1730-1745", "1745-1800" };
+		String yearStr = yearF.getText();
+		int yearInt = Integer.parseInt(yearStr);
+		String monthStr = monthF.getText();
+		int monthInt = Integer.parseInt(monthStr);
+		String dayStr = dayF.getText();
+		int dayInt = Integer.parseInt(dayStr);
+		int[] date = new int[] { yearInt - 1900, monthInt, dayInt };
+		LinkedList<String> waitingLL = new LinkedList<String>();
+		Boolean[] TimeBoolean = new Boolean[40];
+		for(int i = 0; i < TimeBoolean.length; i++){
+			TimeBoolean[i] = true;
+		}
+		for (int i = 0; i < model.getSize(); i++) {
+			waitingLL.add((String) model.get(i));
+		}
+		for (int i = 0; i < waitingLL.size(); i++) {
+			User user = us.getUser(waitingLL.get(i));
+			for (int j = 480; j < 1080; j += 15) {
+				TimeSpan ts = new TimeSpan(CreateTimeStamp(date, j),
+						CreateTimeStamp(date, j + 15));
+				Appt[] appt = parent.controller.RetrieveAppts(user, ts);
+				if (appt != null) {
+					TimeBoolean[(j - 480) / 15] = false;
+				}
+			}
+		}
+		LinkedList<String> result = new LinkedList<String>();
+		for (int i = 0; i < TimeBoolean.length; i++) {
+			if (TimeBoolean[i])
+				result.add(AllTimeHere[i]);
+		}
+//		for (int i = 0; i < result.size(); i++) { // output the whole result for
+//													// debug
+//			System.out.println(result.get(i) + "\n");
+//		}
+
+		SuitableTimeF.setModel(new DefaultComboBoxModel(result.toArray()));
+		
+	}
+
 	private JPanel createPartOperaPane() {
 		JPanel POperaPane = new JPanel();
 		JPanel browsePane = new JPanel();
 		JPanel controPane = new JPanel();
 
 		POperaPane.setLayout(new BorderLayout());
-		TitledBorder titledBorder1 = new TitledBorder(BorderFactory
-				.createEtchedBorder(Color.white, new Color(178, 178, 178)),
-				"Add Participant:");
+		TitledBorder titledBorder1 = new TitledBorder(
+				BorderFactory.createEtchedBorder(Color.white, new Color(178,
+						178, 178)), "Add Participant:");
 		browsePane.setBorder(titledBorder1);
 
 		POperaPane.add(controPane, BorderLayout.SOUTH);
@@ -483,7 +550,6 @@ public class AppScheduler extends JDialog implements ActionListener,
 		// Fix Me!
 		// Save the appointment to the hard disk
 		// 1.Create timestan(for Hashmap key)
-		
 		String yearStr = yearF.getText();
 		int yearInt = Integer.parseInt(yearStr);
 		String monthStr = monthF.getText();
@@ -496,16 +562,12 @@ public class AppScheduler extends JDialog implements ActionListener,
 		Timestamp timestampE = CreateTimeStamp(date, getValidTimeInterval()[1]);
 
 		Appt event = new Appt();
-		event.setusername(parent.controller.getusername());
+		event.setusername(parent.mCurrUser.ID());
 		event.setID(parent.controller.getusableid());
 		event.setstarttime(timestampS);
 		event.setendtime(timestampE);
 		TimeSpan etimespan = new TimeSpan(timestampS, timestampE);
 		event.setTimeSpan(etimespan);
-		if (isPastEvent(event))
-			System.out.println("Past Event could not be saved");
-
-		event.setprivate(priornot);
 		event.setTitle(titleField.getText());
 		LinkedList<String> waiting = new LinkedList<String>();
 		for (int i = 0; i < model.getSize(); i++) {
@@ -518,7 +580,9 @@ public class AppScheduler extends JDialog implements ActionListener,
 			validInput = false;
 		} else {
 			event.setLocation(tempLoc);
+			validInput = true;
 		}
+		event.setprivate(publicbox.isSelected());
 		event.setWaitingList(waiting);
 		if (validInput){
 			if (selectedApptId == -1)
@@ -556,8 +620,15 @@ public class AppScheduler extends JDialog implements ActionListener,
 			return;
 //			System.out.println("Warning:Your friend have another appointment on that day!");
 		}
+        int a=model.getSize()+1;
+		if (locationLL.get(locationF.getSelectedIndex()).getCapacity()<=a) {
+			JOptionPane.showMessageDialog(null, "warning:Over capacity, cannot invite anymore",
+					"Input Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
 		model.addElement(invitelistF.getSelectedItem());
 		waitingList = new JList<String>(model);
+		pack();
 	}
 
 	private Timestamp CreateTimeStamp(int[] date, int time) {
@@ -568,6 +639,37 @@ public class AppScheduler extends JDialog implements ActionListener,
 		stamp.setHours(time / 60);
 		stamp.setMinutes(time % 60);
 		return stamp;
+	}
+	
+	public Boolean[] GetAvailableTimeSlotArray(LinkedList<String> InvitedUser,
+			int date[]) {
+		// public void GetAvailableTimeSlotLL(){
+		Boolean[] AvailableTimeSlotArray = new Boolean[40];
+		for (int i = 0; i < 40; i++) {
+			AvailableTimeSlotArray[i] = true;
+		}
+
+		LinkedList<TimeSpan> AllTimeSlot = new LinkedList<TimeSpan>();
+		for (int a = 480, b = 495; b <= 1080; a = a + 15, b = b + 15) {
+			TimeSpan eachslot = new TimeSpan(CreateTimeStamp(date, a),
+					CreateTimeStamp(date, b));
+			 System.out.println("startT:"+CreateTimeStamp(date,a)+"  EndT"+CreateTimeStamp(date,b));
+			AllTimeSlot.add(eachslot);
+		}
+		System.out.println("InvitedUser.size(): "+InvitedUser.size());
+		System.out.println("AllTimeSlot.size(): "+AllTimeSlot.size());
+		for (int a = 0; a < InvitedUser.size(); a++) {
+			// for (Object key : parent.controller.mApptStorage.mAppts.keySet())
+			// {
+			for (int i = 0; i < AllTimeSlot.size(); i++) {
+				Appt[] tmpAppt = parent.controller.mApptStorage.RetrieveAppts(
+						us.getUser(InvitedUser.get(a)), AllTimeSlot.get(i));
+				if (tmpAppt != null) {
+					AvailableTimeSlotArray[i] = false;
+				}
+			}
+		}
+		return AvailableTimeSlotArray;
 	}
 
 	public void updateSetApp(Appt appt) {

@@ -31,6 +31,8 @@ public class RemoveLocationDialog extends JFrame implements ActionListener {
 		location = l;
 		calgrid = c;
 		
+		setAlwaysOnTop(true);
+		
 		setTitle("Confirmation");
 		
 		Container contentPane;

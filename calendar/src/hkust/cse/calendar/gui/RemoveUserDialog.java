@@ -1,5 +1,6 @@
 package hkust.cse.calendar.gui;
 
+import hkust.cse.calendar.Main.CalendarMain;
 import hkust.cse.calendar.apptstorage.ApptStorageControllerImpl;
 import hkust.cse.calendar.unit.Appt;
 import hkust.cse.calendar.unit.Location;
@@ -75,7 +76,9 @@ public class RemoveUserDialog extends JFrame implements ActionListener {
 			if(user.status == 0){
 				Appt[] temparray = calgrid.controller.mApptStorage.RetrieveAppts(user);
 				for (int i=0;  i< temparray.length;i++){
-				calgrid.controller.ManageAppt(temparray[i], calgrid.controller.REMOVE);}
+				calgrid.controller.ManageAppt(temparray[i], calgrid.controller.REMOVE);
+				}
+				CalendarMain.logOut = true;
 				us.delete(us.UserIndex(user));
 			}
 			else

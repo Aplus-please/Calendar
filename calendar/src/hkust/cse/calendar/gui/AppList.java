@@ -417,10 +417,15 @@ public class AppList extends JPanel implements ActionListener {
 		if (apptTitle == null)
 			return;
 		if(apptTitle.isJoint()){
-			JOptionPane.showMessageDialog(this, "Only initiator can modify.",
+			JOptionPane.showMessageDialog(this, "Only initiator can delete.",
 					"Input Error", JOptionPane.ERROR_MESSAGE);
 			return;
-		}	
+		}
+		if(apptTitle.isPublic() && (!apptTitle.getusername().equals(parent.controller.getusername()))){
+			JOptionPane.showMessageDialog(this, "Only initiator can delete.",
+					"Input Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
 		parent.controller.ManageAppt(apptTitle, 1);
 		clear();
 		setTodayAppt(parent.GetTodayAppt());
@@ -432,6 +437,16 @@ public class AppList extends JPanel implements ActionListener {
 		Appt apptTitle = getSelectedAppTitle();
 		if (apptTitle == null)
 			return;
+		if(apptTitle.isJoint()){
+			JOptionPane.showMessageDialog(this, "Only initiator can modify.",
+					"Input Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		if(apptTitle.isPublic() && (!apptTitle.getusername().equals(parent.controller.getusername()))){
+			JOptionPane.showMessageDialog(this, "Only initiator can modify.",
+					"Input Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
 		AppScheduler setAppDial = new AppScheduler("Modify", parent, apptTitle.getID());
 
 		setAppDial.updateSetApp(apptTitle);

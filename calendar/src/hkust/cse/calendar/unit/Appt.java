@@ -253,7 +253,7 @@ public class Appt implements Serializable {
 		waiting.remove(id);
 	}
 	
-	public boolean isPrivate(){
+	public boolean isPublic(){
 		return appt_private;
 	}
 	

@@ -195,24 +195,37 @@ public class LocationsDialog extends JFrame implements ActionListener {
 		if (e.getSource() == changeBut) {
 			int changeIndex = list.getSelectedIndex();
 			Location changeLocation;
-			if(changeIndex == -1){
+			if (changeIndex == -1) {
 				JOptionPane.showMessageDialog(this,
-						"Please select a location.",
-						"Input Error", JOptionPane.ERROR_MESSAGE);
-			}else{
-				//locationF.setText(inspectLocation.getName());
-				//capacityF.setText(Integer.toString(inspectLocation.getCapacity()));
-				//SaveToTxt(locationLL);
+						"Please select a location.", "Input Error",
+						JOptionPane.ERROR_MESSAGE);
+			} else {
+				// locationF.setText(inspectLocation.getName());
+				// capacityF.setText(Integer.toString(inspectLocation.getCapacity()));
+				// SaveToTxt(locationLL);
 				changeLocation = locationLL.get(changeIndex);
-				if ((locationF.getText().isEmpty())&&(capacityF.getText().isEmpty()))
+				if ((locationF.getText().isEmpty())
+						&& (capacityF.getText().isEmpty()))
 					return;
 				else if (locationF.getText().isEmpty())
-					locationLL.get(changeIndex).setCapacity(Integer.parseInt(capacityF.getText()));
+					locationLL.get(changeIndex).setCapacity(
+							Integer.parseInt(capacityF.getText()));
 				else if (capacityF.getText().isEmpty())
 					locationLL.get(changeIndex).setName(locationF.getText());
-				else{
-					locationLL.get(changeIndex).setCapacity(Integer.parseInt(capacityF.getText()));
-					locationLL.get(changeIndex).setName(locationF.getText());}
+				else {
+					locationLL.get(changeIndex).setCapacity(
+							Integer.parseInt(capacityF.getText()));
+					if (listModel.contains(locationF.getText())){
+						JOptionPane.showMessageDialog(this,
+								"The location is already exist.",
+								"Input Error", JOptionPane.ERROR_MESSAGE);
+					return;
+					
+					}
+					else
+						locationLL.get(changeIndex)
+								.setName(locationF.getText());
+				}
 				listModel.setElementAt(locationF.getText(), changeIndex);
 				SaveToTxt(locationLL);
 			}

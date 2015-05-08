@@ -10,6 +10,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.LinkedList;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -106,14 +107,25 @@ public class AdminDialog extends JFrame implements ActionListener{
 						"Input Error", JOptionPane.ERROR_MESSAGE);
 			}else{
 				Appt[] userarray = parent.controller.mApptStorage.RetrieveRemovedAppts(us.user[deleteIndex]);
+//				int numofUser = 0;
+				LinkedList<String> numOfUser = new LinkedList<String>();
+				if(userarray == null)
+					return;
+				for(int i =0; i < userarray.length; i++){
+					if(numOfUser == null)
+						numOfUser.add(userarray[i].getusername());
+					if(!numOfUser.contains(userarray[i].getusername()))
+						numOfUser.add(userarray[i].getusername());
+				}
 				if(userarray != null){
-					us.user[deleteIndex].status = userarray.length;
+					us.user[deleteIndex].status = numOfUser.size();
 					us.update();
 				}
 				else{
 				us.delete(deleteIndex);
 				listModel.remove(deleteIndex);
 			}
+				
 		}
 	}
 }}

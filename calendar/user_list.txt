@@ -1,7 +1,7 @@
 jmanman|123123|Normal|porn@123.com|Jeffrey Cheung|-1|
-adminbb|123|Admin|admin@github.com|Addieee|-1|
 qwe|dllm|Normal|123@123.com|chan|-1|
 123321|123|Normal|email|name|-1|
+asd|asd|Normal|email|name|-1|
 sally|sally|Normal|email|name|-1|
-qwer|qwer|Normal|email|name|-1|
-sd|sd|Admin|email|name|-1|
+sd|sd|Admin|sd|sd|-1|
+hoho|hoho|Normal|email|name|1|
