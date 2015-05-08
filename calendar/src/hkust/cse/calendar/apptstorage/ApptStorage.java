@@ -169,6 +169,8 @@ public abstract class ApptStorage {
 	public abstract boolean locationCrash(Location location, TimeSpan time);
 	
 	public abstract Appt[] RetrieveAppts(Location location);
+	
+	public abstract void RemoveApptBranch(Appt appt);
 
 	public Appt[] RetrieveAppts(User mCurrUser) {
 		LinkedList<Appt> tmpApptLL = new LinkedList<Appt>();

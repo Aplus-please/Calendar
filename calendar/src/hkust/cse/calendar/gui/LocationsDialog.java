@@ -175,7 +175,7 @@ public class LocationsDialog extends JFrame implements ActionListener {
 				listModel.remove(deleteIndex);
 				SaveToTxt(locationLL);
 			}
-			}
+		}
 
 		}
 		if (e.getSource() == inspectBut) {

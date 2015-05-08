@@ -119,9 +119,17 @@ public class JoinApptDialog extends JFrame implements ActionListener {
 			con.ManageAppt(inviteAppt, con.MODIFY);
 		}
 		if (e.getSource() == rejectBut) {
-			inviteAppt.addReject(con.getDefaultUser().ID());
-			inviteAppt.removeWaitingList(con.getDefaultUser().ID());
-			con.ManageAppt(inviteAppt, con.MODIFY);
+//			inviteAppt.addReject(con.getDefaultUser().ID());
+//			inviteAppt.removeWaitingList(con.getDefaultUser().ID());
+    		for (Object key : con.mApptStorage.mAppts.keySet()){
+    			if(con.mApptStorage.mAppts.get(key).getID()==inviteAppt.getID()){
+    				con.mApptStorage.mAppts.remove(key);
+    				continue;
+    			}
+    			if(con.mApptStorage.mAppts.get(key).getJoinID()==inviteAppt.getID())
+    			{con.mApptStorage.mAppts.remove(key);}
+    		}
+    	con.mApptStorage.saveApptToTxt();	
 		}
 		dispose();
 	}

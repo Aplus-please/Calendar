@@ -37,29 +37,28 @@ public class ApptStorageNullImpl extends ApptStorage {
 	public void SaveAppt(Appt appt) {
 		int locationCapacity = appt.getLocation().getCapacity();
 		for (Object key : mAppts.keySet()) {
-			if (defaultUser.ID().equals(mAppts.get(key).getusername())) {
+			if (appt.getusername().equals(mAppts.get(key).getusername())) {
 				if (appt.TimeSpan().Overlap(mAppts.get(key).TimeSpan())) {
-					JOptionPane.showMessageDialog(null, "Time crash with another appointment.",
+					JOptionPane.showMessageDialog(null, "Time crash with another appointment,"+appt.getusername(),
 							"Input Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 			}
 		}
-//		for (Object key : mAppts.keySet()) {
-//				if (appt.getLocation().getName()
-//		.equals(mAppts.get(key).getLocation().getName())) {
-//				if (appt.TimeSpan().Overlap(mAppts.get(key).TimeSpan())) {
-//					if (locationCapacity <= 1) {
-//						JOptionPane.showMessageDialog(null, "Over capacity.",
-//								"Input Error", JOptionPane.ERROR_MESSAGE);
-//						return;
-//					}
-//					locationCapacity--;
-//				}
-//
-//			}
-//		}
-		// appt.setID(getusableid());
+		//check timeoverlap+same place
+		for (Object key : mAppts.keySet()) {
+			if (appt.TimeSpan().Overlap(mAppts.get(key).TimeSpan())) {
+				if (mAppts.get(key).getLocation().getName().equals(appt.getLocation().getName())) {
+					if(appt.isJoint())
+					{break;}
+					JOptionPane.showMessageDialog(null, "Location crash with "+mAppts.get(key).getusername()+" 's event,"+appt.getusername(),
+							"Input Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+			}
+		}
+
+		appt.setID(getusableid());
 		mAppts.put(appt.getID(), appt);
 		mAppts.remove(0);
 		saveApptToTxt();
@@ -100,23 +99,6 @@ public class ApptStorageNullImpl extends ApptStorage {
 		apptArray = tmpApptLL.toArray(new Appt[tmpApptLL.size()]);
 		return apptArray;
 	}
-	
-	@Override
-	public Appt[] RetrieveAppts(Location location) {
-		LinkedList<Appt> tmpApptLL = new LinkedList<Appt>();
-		for (Object key : mAppts.keySet()){
-			Appt tmpAppt = mAppts.get(key);
-			if(tmpAppt.getLocation().getName().equals(location.getName())){
-				tmpApptLL.add(tmpAppt);
-			}
-		}
-		if(tmpApptLL.isEmpty()){
-			return null;
-		}
-		Appt[] apptArray = new Appt[tmpApptLL.size()];
-		apptArray = tmpApptLL.toArray(new Appt[tmpApptLL.size()]);
-		return apptArray;
-	}
 
 	@Override
 	public Appt RetrieveAppts(int joinApptID) {
@@ -135,9 +117,20 @@ public class ApptStorageNullImpl extends ApptStorage {
 	public void RemoveAppt(Appt appt) {
 		// TODO Auto-generated method stub
        mAppts.remove(appt.getID());
+  
        saveApptToTxt();
 	}
-
+	public void RemoveApptBranch(Appt appt) {
+		// TODO Auto-generated method stub
+    LinkedList<Appt> Branch=new LinkedList<Appt>();
+    for (Object key : mAppts.keySet()) {
+    if(mAppts.get(key).getJoinID()==appt.getID())
+    {Branch.add(mAppts.get(key));}
+    }
+    for (int a=0;a<Branch.size();a++)
+    {mAppts.remove(Branch.get(a).getID());}
+     saveApptToTxt();
+	}
 	@Override
 	public User getDefaultUser() {
 		// TODO Auto-generated method stub
@@ -180,20 +173,19 @@ public class ApptStorageNullImpl extends ApptStorage {
 	}
 	
 	@Override
-	public void testing2() {
-//		System.out.println("Print all location start!!");
-//		for (Object key : Llist.keySet()) {
-//			System.out.println(key + " : " + Llist.get(key));
-//		}
-//		System.out.println("Print all location end!!");
+	public void testing2()
+	{      System.out.println("Print all location start!!");
+	       for (Object key : mLocations.keySet()) {
+	            System.out.println(key + " : " + mLocations.get(key));}
+	       System.out.println("Print all location end!!");
 	}
 	
 	@Override
 	public void setlocationlist(String location)
 	{
-//		Llist.put(location,location);
-//	    System.out.println("Save Location successfully");
-//	    testing2();
+		mLocations.put(location,new Location(location));
+	    System.out.println("Save Location successfully");
+	    testing2();
 	}
 	//new add
 	@Override
@@ -298,5 +290,16 @@ public class ApptStorageNullImpl extends ApptStorage {
 		}
 
 	}
+
+	@Override
+	public Appt[] RetrieveAppts(Location location) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	
+	
+	
+	
 }
 

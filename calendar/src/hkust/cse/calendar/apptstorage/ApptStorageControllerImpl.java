@@ -1,5 +1,7 @@
 package hkust.cse.calendar.apptstorage;
 
+import javax.swing.JOptionPane;
+
 import hkust.cse.calendar.unit.Location;
 import hkust.cse.calendar.unit.Appt;
 import hkust.cse.calendar.unit.TimeSpan;
@@ -45,16 +47,18 @@ public class ApptStorageControllerImpl {
 	 * parameters: the Appt involved, the action to take on the Appt */
 	public void ManageAppt(Appt appt, int action) {
 
-		if (action == NEW) {				// Save the Appt into the storage if it is new and non-null
+		if (action == NEW) {				// Save the Appt into the storage if it is new and non-null 3
 			if (appt == null)
 				return;
 			mApptStorage.SaveAppt(appt);
-		} else if (action == MODIFY) {		// Update the Appt in the storage if it is modified and non-null
+		} else if (action == MODIFY) {		// Update the Appt in the storage if it is modified and non-null 2
 			if (appt == null)
 				return;
 			mApptStorage.UpdateAppt(appt);
-		} else if (action == REMOVE) {		// Remove the Appt from the storage if it should be removed
-			mApptStorage.RemoveAppt(appt);
+		} else if (action == REMOVE) {		// Remove the Appt from the storage if it should be removed 1
+         mApptStorage.RemoveApptBranch(appt);
+         mApptStorage.RemoveAppt(appt);
+         return;
 		} 
 	}
 
